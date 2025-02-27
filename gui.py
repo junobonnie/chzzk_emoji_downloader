@@ -11,6 +11,8 @@ from tkinter import filedialog
 import os
 import threading
 
+GREEN = "#1fa372"
+
 def download_emojis(streamer_no :str, download_path: str = ""):
     streamer_name = ced.get_streamer_name(streamer_no)
     abs_path = ced.join_path(download_path, streamer_name)
@@ -31,8 +33,8 @@ def download_emojis(streamer_no :str, download_path: str = ""):
             f.write(requests.get(emoji_url).content)
         
         # 이미지 다운로드 시간 체크
-        progress_bar.set((i+1)/emoji_number)
-    progress_bar.set(1.)
+        progress_update((i+1)/emoji_number)
+    progress_update(1.)
         
 def on_button_click():
     def task():
@@ -77,6 +79,10 @@ def open_download_path():
     if os.path.isdir(path):
         os.startfile(path)
 
+def progress_update(value):
+    progress_bar.set(value)
+    download_percent_label.configure(text="%.2f%%"%(value*100))
+    
 # UI 초기화
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
@@ -88,10 +94,10 @@ root.iconbitmap("icon.ico")
 
 # URL 입력 필드
 entry = ctk.CTkEntry(root, placeholder_text="스트리머의 방송주소를 입력하세요")
-entry.pack(pady=10, padx=20, fill='x')
+entry.pack(pady=10, padx=25, fill='x')
 
 # 다운로드 경로 입력 필드 및 버튼
-path_frame = ctk.CTkFrame(root)
+path_frame = ctk.CTkFrame(root, fg_color="transparent")
 path_frame.pack(pady=10, padx=20, fill='x')
 
 path_entry = ctk.CTkEntry(path_frame, placeholder_text="다운로드 경로를 선택하세요", width=200)
@@ -106,7 +112,7 @@ open_button = ctk.CTkButton(path_frame, text="열기", command=open_download_pat
 open_button.pack(side="right", padx=5)
 
 # 다운로드 버튼
-download_frame = ctk.CTkFrame(root)
+download_frame = ctk.CTkFrame(root, fg_color="transparent")
 download_frame.pack(pady=10, padx=20, fill='x')
 
 # 진행 상태 바
@@ -114,6 +120,8 @@ progress_bar = ctk.CTkProgressBar(download_frame)
 progress_bar.pack(side="left", fill='x', expand=True, padx=5)
 progress_bar.set(0)
 
+download_percent_label = ctk.CTkLabel(download_frame, text="0.0%", text_color=GREEN, width=50)
+download_percent_label.pack(side="left", padx=5)
 
 # 확인 버튼 및 진행 상태 바 배치
 button = ctk.CTkButton(download_frame, text="다운로드", command=on_button_click, width=90)
